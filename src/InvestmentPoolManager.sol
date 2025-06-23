@@ -23,9 +23,20 @@ contract InvestmentPoolManager is AccessControl {
         uint256 lockUntil;
     }
     mapping(address => DepositInfo) public deposits;
+    
+    // Track pending withdrawals when contract doesn't have enough balance
+    struct PendingWithdrawal {
+        address user;
+        uint256 amount;
+        bool fulfilled;
+    }
+    PendingWithdrawal[] public pendingWithdrawals;
+    mapping(address => uint256[]) public userPendingWithdrawals; // User address -> array of indices in pendingWithdrawals
 
     event Deposited(address indexed user, uint256 amount, uint256 lockUntil);
     event Withdrawn(address indexed user, uint256 amount);
+    event WithdrawalPending(address indexed user, uint256 amount, uint256 pendingWithdrawalId);
+    event WithdrawalFulfilled(address indexed user, uint256 amount, uint256 pendingWithdrawalId);
     event ThresholdTransfer(uint256 amount, address indexed to);
     event ManualTransfer(uint256 amount, address indexed to);
     event EmergencyTokenWithdraw(address indexed token, address indexed to, uint256 amount);
@@ -93,10 +104,47 @@ contract InvestmentPoolManager is AccessControl {
         DepositInfo storage info = deposits[msg.sender];
         require(info.amount >= amount, "Not enough deposited");
         require(block.timestamp >= info.lockUntil, "Funds locked");
+        
+        // Update user deposit info and burn pool tokens
         info.amount -= amount;
         poolToken.burn(msg.sender, amount);
-        fundingToken.safeTransfer(msg.sender, amount);
-        emit Withdrawn(msg.sender, amount);
+        
+        // Check if contract has enough balance for withdrawal
+        uint256 contractBalance = fundingToken.balanceOf(address(this));
+        if (contractBalance >= amount) {
+            // If enough balance, process withdrawal immediately
+            fundingToken.safeTransfer(msg.sender, amount);
+            emit Withdrawn(msg.sender, amount);
+        } else {
+            // If not enough balance, create pending withdrawal
+            uint256 pendingWithdrawalId = pendingWithdrawals.length;
+            pendingWithdrawals.push(PendingWithdrawal({
+                user: msg.sender,
+                amount: amount,
+                fulfilled: false
+            }));
+            userPendingWithdrawals[msg.sender].push(pendingWithdrawalId);
+            emit WithdrawalPending(msg.sender, amount, pendingWithdrawalId);
+        }
+    }
+    
+    // Admin function to fulfill pending withdrawals
+    function fulfillPendingWithdrawal(uint256 pendingWithdrawalId) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(pendingWithdrawalId < pendingWithdrawals.length, "Invalid withdrawal ID");
+        PendingWithdrawal storage withdrawal = pendingWithdrawals[pendingWithdrawalId];
+        require(!withdrawal.fulfilled, "Already fulfilled");
+        
+        uint256 contractBalance = fundingToken.balanceOf(address(this));
+        require(contractBalance >= withdrawal.amount, "Not enough balance");
+        
+        withdrawal.fulfilled = true;
+        fundingToken.safeTransfer(withdrawal.user, withdrawal.amount);
+        emit WithdrawalFulfilled(withdrawal.user, withdrawal.amount, pendingWithdrawalId);
+    }
+    
+    // View function to get pending withdrawals for a user
+    function getPendingWithdrawals(address user) external view returns (uint256[] memory) {
+        return userPendingWithdrawals[user];
     }
 
     // --- Pool Info ---

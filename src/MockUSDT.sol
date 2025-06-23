@@ -10,6 +10,10 @@ contract MockUSDT is ERC20 {
         owner = msg.sender;
     }
 
+    function decimals() public pure override returns (uint8) {
+        return 6;
+    }
+
     function mint(address to, uint256 amount) external {
         require(msg.sender == owner, "Only owner can mint");
         _mint(to, amount);

@@ -36,6 +36,8 @@ flowchart TD
 *Withdrawals:* user burns IPT; manager releases USDT after the lock-in period.  
 When the pool balance exceeds a configurable threshold the manager can (auto/manual) forward funds to a multisig.
 
+*Pending Withdrawals:* If a user attempts to withdraw when the contract doesn't have enough USDT (due to threshold transfers), the withdrawal is queued as pending. Admin can fulfill these requests later when funds are available.
+
 ## Admin Configuration
 
 The `DEFAULT_ADMIN_ROLE` in `InvestmentPoolManager` can manage the following settings:
@@ -49,6 +51,7 @@ The `DEFAULT_ADMIN_ROLE` in `InvestmentPoolManager` can manage the following set
 | `setFundingToken(address _fundingToken)` | Update the ERC-20 used as the funding token (e.g., switch from mock to real USDT). |
 | `setPoolToken(address _poolToken)` | Update the address of the pool share token (IPT). |
 | `manualTransferToMultisig(uint256 amount)` | Manually move any amount (≤ pool balance) to the multisig wallet. |
+| `fulfillPendingWithdrawal(uint256 pendingWithdrawalId)` | Process a pending withdrawal when funds are available. |
 
 `MANAGER_ROLE` holders can additionally call:
 

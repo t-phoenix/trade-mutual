@@ -20,4 +20,8 @@ contract InvestmentPoolToken is ERC20, AccessControl {
     function burn(address from, uint256 amount) external onlyRole(MINTER_BURNER_ROLE) {
         _burn(from, amount);
     }
+
+    function decimals() public pure override returns (uint8) {
+        return 6;
+    }
 }

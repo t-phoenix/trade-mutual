@@ -1,0 +1,34 @@
+## Sepolia
+admin = 0xCD949192344f41de8D99336a4F32Bb0b9C04e577
+usdt = 0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0
+usdc = 0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8
+TMIP-1 = 0x2D8CF5D4849a64350F96E91895AC1F4F66744BfB //POOL TOKEN
+Pool Manager = 0x86c8c2015fac583a33eEebDfD404aceb4D42f37E  
+
+
+//TPIM
+Trade Mutual Investment Pool 1
+TMIP-1
+admin === admin
+
+// Pool Manager
+funding token =  usdt
+pool token = TPIM-1
+multisig = admin
+threshold = 1000000000  // 6 decimal for USDT
+lockPeriod = 10 blocks
+admin == admin
+
+
+Add Pool Manager to Minter/burner role in TMIP
+
+
+Test Account = 0x4e39a3aE616a3e7d853ab54D0Ca242188a89Fc80
+
+Steps
+Fund Metamask with sepolia ETH (https://www.alchemy.com/faucets/ethereum-sepolia)
+Fund Metamask with USDT Faucet on Sepolia- Aave (https://gho.aave.com/faucet/)
+Approve USDT to Pool Manager (necessary to withdraw USDT from investor wallet )- can use permitERC20 in future for better UX
+use `deposit` function and add amount of USDT to deposit.
+You can check TMIP-1 token balance in your wallet
+Use `withdraw` function to burn TMIP-1 and get USDC back.
