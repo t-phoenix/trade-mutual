@@ -2,6 +2,7 @@
 admin = 0xCD949192344f41de8D99336a4F32Bb0b9C04e577
 usdt = 0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0
 usdc = 0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8
+
 TMIP-1 = 0x2D8CF5D4849a64350F96E91895AC1F4F66744BfB //POOL TOKEN
 Pool Manager = 0x86c8c2015fac583a33eEebDfD404aceb4D42f37E  
 
@@ -32,3 +33,8 @@ Approve USDT to Pool Manager (necessary to withdraw USDT from investor wallet )-
 use `deposit` function and add amount of USDT to deposit.
 You can check TMIP-1 token balance in your wallet
 Use `withdraw` function to burn TMIP-1 and get USDC back.
+
+
+// TMIP-2
+TMIP-2 = 0x43959EBDe5AAD65E597DB1a49Cb209d3656f43f1
+Pool Manager V2 = 0x8bd2509D9Cc416f30519d96CECA857b933A8CDAe
